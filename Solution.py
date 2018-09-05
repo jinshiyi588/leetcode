@@ -1,6 +1,59 @@
 import re
+import collections
 
 class Solution(object):
+    def fullJustify(self, words, maxWidth):
+        """
+        :type words: List[str]
+        :type maxWidth: int
+        :rtype: List[str]
+        """
+        result = []
+        i = 0
+        while i < len(words):
+            start = i
+            words_length_in_line = 0
+            words_in_line = 1
+            while i<len(words) and (words_length_in_line + len(words[i]) + words_in_line - 1) <= maxWidth:
+                words_length_in_line += len(words[i])
+                words_in_line += 1
+                i += 1
+            words_in_line -= 1
+            if i == len(words):
+                str =''
+                for k in range(start, i-1):
+                    str += words[k] + ' '
+                str += words[i-1]
+                rest_blank = maxWidth - len(str)
+                while rest_blank > 0:
+                    str += ' '
+                    rest_blank -= 1
+                result.append(str)
+                return result
+            elif words_in_line == 1:
+                str = words[start]
+                rest_blank = maxWidth - len(str)
+                while rest_blank > 0:
+                    str += ' '
+                    rest_blank -= 1
+            else:
+                allblank = maxWidth - words_length_in_line
+                blank_length = int(allblank / (words_in_line - 1))
+                blank_mod = allblank % (words_in_line - 1)
+                str = ''
+                for j in range(words_in_line):
+                    str += words[start + j]
+                    if j != words_in_line-1:
+                        temp1 = blank_length
+                        while temp1 > 0:
+                            str += ' '
+                            temp1 -= 1
+                        if blank_mod != 0:
+                            str += ' '
+                            blank_mod -= 1
+            result.append(str)
+        return result
+    
     def isNumber(self, s):
         """
         :type s: str
@@ -41,6 +94,21 @@ class Solution(object):
 
         return digits
 
+    def climbStairs(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        dp=[]
+        for i in range(n):
+            if i == 0:
+                dp.append(1)
+            elif i == 1:
+                dp.append(2)
+            else:
+                dp.append(dp[i-1]+dp[i-2])
+        return dp[n-1]
+
     def addBinary(self, a, b):
         """
         :type a: str
@@ -80,6 +148,33 @@ class Solution(object):
             answer = '1' + answer
         return answer
 
+    def simplifyPath(self, path):
+        """
+        :type path: str
+        :rtype: str
+        """
+        result_paths = []
+        strs = path.split('/')
+        for i in range(len(strs)):
+            if strs[i] == '':
+                continue
+            elif strs[i] == '..':
+                if len(result_paths) > 0:
+                    result_paths.pop()
+                else:
+                    continue
+            elif strs[i] == '.':
+                continue
+            else:
+                result_paths.append(strs[i])
+        result = '/'
+        for i in range(len(result_paths)):
+            if i != len(result_paths)-1:
+                result = result + result_paths[i] + '/'
+            else:
+                result += result_paths[i]
+        return result
+
     def mySqrt(self, x):
         """
         :type x: int
@@ -101,6 +196,30 @@ class Solution(object):
             return left
         else:
             return right
+
+    def minDistance(self, word1, word2):
+        """
+        :type word1: str
+        :type word2: str
+        :rtype: int
+        """
+        n = len(word1)+1
+        m = len(word2)+1
+        dpArrays = [([0] * m) for i in range(n)]
+        for i in range(n):
+            for j in range(m):
+                if i == 0 and j == 0:
+                    dpArrays[0][0] = 0
+                elif i == 0:
+                    dpArrays[0][j] = j
+                elif j == 0:
+                    dpArrays[i][0] = i
+                else:
+                    if word1[i-1] == word2[j-1]:
+                        dpArrays[i][j] = dpArrays[i-1][j-1]
+                    else:
+                        dpArrays[i][j] = min(dpArrays[i][j-1], dpArrays[i-1][j], dpArrays[i-1][j-1]) + 1
+        return dpArrays[n-1][m-1]
 
     def sortColors(self, nums):
         """
@@ -127,45 +246,87 @@ class Solution(object):
             else:
                 continue
 
+    def setZeroes(self, matrix):
+        """
+        :type matrix: List[List[int]]
+        :rtype: void Do not return anything, modify matrix in-place instead.
+        """
+        rows = set()
+        cols = set()
+        m = len(matrix)
+        n = len(matrix[0])
+        for i in range(m):
+            for j in range(n):
+                if matrix[i][j] == 0:
+                    rows.add(i)
+                    cols.add(j)
+        for i in rows:
+            for j in range (n):
+                matrix[i][j] = 0
+        for i in range (m):
+            for j in cols:
+                matrix[i][j] = 0
+        for i in range(m):
+            for j in range(n):
+                print(matrix[i][j])
+
+    def searchMatrix(self, matrix, target):
+        """
+        :type matrix: List[List[int]]
+        :type target: int
+        :rtype: bool
+        """
+        row = len(matrix)
+        if row == 0:
+            return False
+        col = len(matrix[0])
+        if col == 0:
+            return False
+        if target < matrix[0][0]:
+            return False
+        for i in range(row):
+            if target > matrix[i][col-1]:
+                continue
+            else:
+                for j in range(col):
+                    if target == matrix[i][j]:
+                        return True
+                    else:
+                        continue
+        return False
+
     def minWindow(self, s, t):
         """
         :type s: str
         :type t: str
         :rtype: str
         """
-        if len(s) < len(t):
+        if not s or not t:
             return ""
-        dict = {}
-        start = -1
-        end = -1
-        min = len(s)
-        hasAll = False
-        for i in range(len(t)):
-            dict[t[i]] = -1
-        for j in range(len(s)):
-            if s[j] in dict:
-                if len(dict) == 1:
-                    end = j
-                    start = j
-                    break
-                else:
-                    dict[s[j]] = j
-                    temp = len(s)
-                    for key in dict:
-                        if key != s[j]:
-                            if dict[key] == -1:
-                                hasAll = False
-                                break
-                            hasAll = True
-                            if dict[key] < temp:
-                                temp = dict[key]
-                    if hasAll and j-temp < min:
-                        min = j - temp
-                        start = temp
-                        end = j
-        if end == -1:
+        dict1 = collections.Counter(t)
+        required = len(dict1)
+        l = 0
+        r = 0
+        formed = 0
+        current_window = {}
+        ans = float('inf'), None, None
+        while r < len(s):
+            char = s[r]
+            current_window[char] = current_window.get(char, 0) + 1
+            if char in dict1 and current_window[char] == dict1[char]:
+                formed += 1
+            while l <= r and formed == required:
+                if (r - l + 1) < ans[0]:
+                    ans = (r - l + 1, l, r)
+                char = s[l]
+                l += 1
+                current_window[char] = current_window[char] - 1
+                if char in dict1 and current_window[char] < dict1[char]:
+                    formed -= 1
+            r += 1
+        if ans[1] is None:
             return ""
-        return s[start:end+1]
+        return s[ans[1]: ans[2]+1]
 
     def combine(self, n, k):
         """
@@ -192,7 +353,13 @@ class Solution(object):
             self.combine_rec(i+1, list, result, n, k)
             list.pop()
 
+    def subsets(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[List[int]]
+        """
+
 
 if __name__ == '__main__':
-    solution = Solution()
-    print(solution.combine(4, 2))
+    s = Solution()
+    print(s.minWindow('abaacb', 'abc'))
