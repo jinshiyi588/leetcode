@@ -358,8 +358,89 @@ class Solution(object):
         :type nums: List[int]
         :rtype: List[List[int]]
         """
+        result = []
+        i = 0
+        result.append([])
+        while i <len(nums):
+            for j in range(len(result)):
+                currentlist = []
+                for k in range(len(result[j])):
+                    currentlist.append(result[j][k])
+                currentlist.append(nums[i])
+                result.append(currentlist)
+            i += 1
+        return result
+
+    def exist(self, board, word):
+        """
+        :type board: List[List[str]]
+        :type word: str
+        :rtype: bool
+        """
+        if len(board) ==0 or len(board[0]) == 0 or len(word) == 0 or (len(board) * len(board[0]) < len(word)):
+            return False
+        visited = []
+        for i in range(len(board)):
+            tmp = []
+            for j in range(len(board[0])):
+                tmp.append(False)
+            visited.append(tmp)
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if self.exist_rec(board, word, 0, i, j,visited):
+                    return True
+        return False
+
+    def exist_rec(self, board, word, index, x, y, visited):
+        if index == len(word):
+            return True
+        if x < 0 or x == len(board) or y < 0 or y == len(board[0]) or visited[x][y]:
+            return False
+        if board[x][y] == word[index]:
+            visited[x][y] = True
+            up = self.exist_rec(board, word, index+1, x-1, y, visited)
+            down = self.exist_rec(board, word, index+1, x+1, y, visited)
+            left = self.exist_rec(board, word, index+1, x, y-1, visited)
+            right = self.exist_rec(board, word, index+1, x, y+1, visited)
+            visited[x][y] = False
+            return down | up | left | right
+        else:
+            return False
+
+    def search(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: bool
+        """
+        def search_inside(left, right):
+            if left > right:
+                return False
+            mid = int((left + right) / 2)
+            if nums[mid] == target:
+                return True
+            elif nums[mid] > target:
+                return search_inside(left, mid-1)
+            else:
+                return search_inside(mid+1, right)
+
+        head = 0
+        for i in range(1, len(nums)):
+            if nums[i] < nums[i - 1]:
+                head = i
+                break
+        if head == 0:
+            return search_inside(0, len(nums) - 1)
+        else:
+            if target > nums[0]:
+                return search_inside(1, head-1)
+            elif target < nums[0]:
+                return search_inside(head, (len(nums)-1))
+            else:
+                return True
 
 
 if __name__ == '__main__':
     s = Solution()
-    print(s.minWindow('abaacb', 'abc'))
+    nums = [2,5,6,0,0,1,2]
+    print(s.search(nums, 3))
