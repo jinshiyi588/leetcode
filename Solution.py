@@ -1,5 +1,7 @@
 import re
 import collections
+import ListNode
+
 
 class Solution(object):
     def fullJustify(self, words, maxWidth):
@@ -440,7 +442,86 @@ class Solution(object):
                 return True
 
 
+    ### ！虽然是medium 但是满难的！
+    def deleteDuplicates2(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
+        if not head:
+            return head
+        newnode = ListNode.ListNode(0)
+        newnode.next = head
+        pre = newnode
+        while pre.next:
+            cur = pre.next
+            while cur.next and cur.val == cur.next.val:
+                cur = cur.next
+            if pre.next == cur:
+                pre = cur
+            else:
+                pre.next = cur.next
+        return newnode.next
+
+    def deleteDuplicates(self, head):
+        """
+        :type head: ListNode
+        :rtype: ListNode
+        """
+        if not head or not head.next:
+            return head
+        cur = head
+        while cur:
+            if cur.next and cur.val == cur.next.val:
+                cur.next = cur.next.next
+            else:
+                cur = cur.next
+        return head
+
+    def largestRectangleArea(self, heights):
+        """
+        :type heights: List[int]
+        :rtype: int
+        """
+        dparray = []
+
+        for i in range(len(heights)):
+            if i == 0:
+                dparray.append([heights[0], 0, 0, heights[0], heights[0]])# largestRectangle, start, end, largestRecHeight, minHeight
+            else:
+                if heights[i] < dparray[i-1][3]:
+                    if dparray[i-1][2] != i-1:
+                        minHeight = min(heights[i], dparray[i-1][4])
+                        rec1 = minHeight * (i+1)
+                        # rec1 需要遍历计算
+                        if rec1 > dparray[i-1][0]:
+                            dparray.append([rec1, 0, i, minHeight, minHeight])
+                        else:
+                            dparray.append([dparray[i-1][0], dparray[i-1][1],dparray[i-1][2],dparray[i-1][3],minHeight])
+                    else:
+                        rec1 = heights[i] * (i-dparray[i-1][1]+1)
+                        if rec1 > dparray[i-1][0]:
+                            dparray.append([rec1, dparray[i-1][1], i, heights[i], min(heights[i], dparray[i-1][4])])
+                        else:
+                            dparray.append([dparray[i-1][0], dparray[i-1][1], dparray[i-1][2], dparray[i-1][3], min(heights[i], dparray[i-1][4])])
+                else:
+                    if dparray[i - 1][2] != i - 1:
+                        rec1 = heights[i]
+                        if rec1 > dparray[i-1][0]:
+                            dparray.append([rec1, i, i , heights[i], dparray[i-1][4]])
+                        else:
+                            dparray.append([dparray[i-1][0], dparray[i-1][1], dparray[i-1][2], dparray[i-1][3], dparray[i-1][4]])
+                    else:
+                        rec1 = heights[i]
+                        rec2 = dparray[i-1][3]*(i - dparray[i-1][1]+1)
+                        if rec1 > rec2:
+                            dparray.append([rec1, i, i, heights[i], dparray[i-1][4]])
+                        else:
+                            dparray.append([rec2, dparray[i-1][1], i, dparray[i-1][3], dparray[i-1][4]])
+        return dparray[len(heights)-1][0]
+
+
 if __name__ == '__main__':
     s = Solution()
-    nums = [2,5,6,0,0,1,2]
-    print(s.search(nums, 3))
+    heights = [2,1,5,6,2,3]
+    print(s.largestRectangleArea(heights))
