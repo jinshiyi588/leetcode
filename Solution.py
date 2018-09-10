@@ -409,6 +409,44 @@ class Solution(object):
         else:
             return False
 
+    def removeDuplicates(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: int
+        """
+        if len(nums) <= 2:
+            return len(nums)
+        length = 0
+        currentlen = 0
+        i = 0
+        while i < len(nums):
+            if i == 0:
+                length += 1
+                currentlen += 1
+            else:
+                if nums[i] == nums[length-1]:
+                    currentlen += 1
+                    if currentlen <= 2:
+                        if i != length and nums[length] != nums[i]:
+                            nums[length] = nums[i]
+                        length += 1
+                    else:
+                        j = i
+                        while j < len(nums) and nums[j] == nums[length-1]:
+                            j += 1
+                        if j < len(nums):
+                            nums[length] = nums[j]
+                            i = j
+                            length += 1
+                            currentlen = 1
+                else:
+                    currentlen = 1
+                    if i != length and nums[length] != nums[i]:
+                        nums[length] = nums[i]
+                    length += 1
+            i += 1
+        return length
+
     def search(self, nums, target):
         """
         :type nums: List[int]
