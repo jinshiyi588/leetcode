@@ -619,21 +619,39 @@ class Solution(object):
             return head
         return answer
 
+    def isScramble(self, s1, s2):
+        """
+        :type s1: str
+        :type s2: str
+        :rtype: bool
+        """
+        if len(s1) != len(s2):
+            return False
+        if s1 == s2:
+            return True
+        ss1 = "".join((lambda x: (x.sort(), x)[1])(list(s1)))
+        ss2 = "".join((lambda x: (x.sort(), x)[1])(list(s2)))
+        if ss1 != ss2:
+            return False
+        for i in range(1, len(s1)):
+            s11 = s1[0:i]
+            s12 = s1[i:len(s1)]
+            s21 = s2[0:i]
+            s22 = s2[i:len(s2)]
+            if self.isScramble(s11, s21) and self.isScramble(s12, s22):
+                return True
+            elif self.isScramble(s11, s22) and self.isScramble(s12, s21):
+                return True
+            s21 = s2[0:len(s2)-i]
+            s22 = s2[len(s2)-i:len(s2)]
+            if self.isScramble(s11, s21) and self.isScramble(s12, s22):
+                return True
+            elif self.isScramble(s11, s22) and self.isScramble(s12, s21):
+                return True
+        return False
+
 
 if __name__ == '__main__':
     s = Solution()
-    l1 = ListNode.ListNode(3)
-    l2 = ListNode.ListNode(4)
-    l3 = ListNode.ListNode(4)
-    l4 = ListNode.ListNode(5)
-    l5 = ListNode.ListNode(5)
-    l6 = ListNode.ListNode(5)
-    l1.next = l2
-    l2.next = l3
-    l3.next = l4
-    l4.next = l5
-    l5.next = l6
-    l1 = s.partition(l1, 3)
-    while l1:
-        print(l1.val)
-        l1 = l1.next
+    print(s.isScramble('abcdefghijklmn', 'efghijklmncadb'))
+
