@@ -1,6 +1,8 @@
 import re
 import collections
 import ListNode
+import Stack
+import copy
 
 
 class Solution(object):
@@ -516,50 +518,122 @@ class Solution(object):
                 cur = cur.next
         return head
 
+    def largestRectangleArea1(self, heights):
+        """
+        :type heights: List[int]
+        :rtype: int
+        """
+        res = 0
+        h = copy.copy(heights)
+        h.append(0)
+        for i in range(len(h)):
+            if i+1 == len(h) or h[i] <= h[i+1]:
+                continue
+            else:
+                minHeight = h[i]
+                for j in range(i, -1, -1):
+                    minHeight = min(h[j], minHeight)
+                    area = minHeight * (i-j+1)
+                    res = max(res, area)
+        return res
+
     def largestRectangleArea(self, heights):
         """
         :type heights: List[int]
         :rtype: int
         """
-        dparray = []
-
-        for i in range(len(heights)):
-            if i == 0:
-                dparray.append([heights[0], 0, 0, heights[0], heights[0]])# largestRectangle, start, end, largestRecHeight, minHeight
+        stack = Stack.Stack()
+        i = 0
+        maxarea = 0
+        h = copy.copy(heights)
+        h.append(0)
+        while i < len(h):
+            if stack.is_empty() or h[stack.peek()] <= h[i]:
+                stack.push(i)
+                i += 1
             else:
-                if heights[i] < dparray[i-1][3]:
-                    if dparray[i-1][2] != i-1:
-                        minHeight = min(heights[i], dparray[i-1][4])
-                        rec1 = minHeight * (i+1)
-                        # rec1 需要遍历计算
-                        if rec1 > dparray[i-1][0]:
-                            dparray.append([rec1, 0, i, minHeight, minHeight])
-                        else:
-                            dparray.append([dparray[i-1][0], dparray[i-1][1],dparray[i-1][2],dparray[i-1][3],minHeight])
-                    else:
-                        rec1 = heights[i] * (i-dparray[i-1][1]+1)
-                        if rec1 > dparray[i-1][0]:
-                            dparray.append([rec1, dparray[i-1][1], i, heights[i], min(heights[i], dparray[i-1][4])])
-                        else:
-                            dparray.append([dparray[i-1][0], dparray[i-1][1], dparray[i-1][2], dparray[i-1][3], min(heights[i], dparray[i-1][4])])
+                t = stack.pop()
+                width = 0
+                if stack.is_empty():
+                    width = i
                 else:
-                    if dparray[i - 1][2] != i - 1:
-                        rec1 = heights[i]
-                        if rec1 > dparray[i-1][0]:
-                            dparray.append([rec1, i, i , heights[i], dparray[i-1][4]])
-                        else:
-                            dparray.append([dparray[i-1][0], dparray[i-1][1], dparray[i-1][2], dparray[i-1][3], dparray[i-1][4]])
-                    else:
-                        rec1 = heights[i]
-                        rec2 = dparray[i-1][3]*(i - dparray[i-1][1]+1)
-                        if rec1 > rec2:
-                            dparray.append([rec1, i, i, heights[i], dparray[i-1][4]])
-                        else:
-                            dparray.append([rec2, dparray[i-1][1], i, dparray[i-1][3], dparray[i-1][4]])
-        return dparray[len(heights)-1][0]
+                    width = i - stack.peek() -1
+                maxarea = max(maxarea, h[t] * width)
+        return maxarea
+
+    def maximalRectangle(self, matrix):
+        """
+        :type matrix: List[List[str]]
+        :rtype: int
+        """
+        heights = []
+        for i in range(len(matrix)):
+            current_row_height = []
+            for j in range(len(matrix[0])):
+                h = 0
+                row = i
+                while row >= 0 and matrix[row][j] == '1':
+                    h += 1
+                    row -= 1
+                current_row_height.append(h)
+            heights.append(current_row_height)
+        maxarea = 0
+        for i in range(len(matrix)):
+            maxarea = max(maxarea, self.largestRectangleArea(heights[i]))
+        return maxarea
+
+    def partition(self, head, x):
+        """
+        :type head: ListNode
+        :type x: int
+        :rtype: ListNode
+        """
+        answer = None
+        if not head:
+            return answer
+        answerlast = answer
+        largerlist = None
+        largerlist_pre = largerlist
+        current = head
+        while current:
+            if current.val < x:
+                if answer is None:
+                    answer = ListNode.ListNode(current.val)
+                    answerlast = answer
+                else:
+                    node = ListNode.ListNode(current.val)
+                    answerlast.next = node
+                    answerlast = node
+            else:
+                if largerlist is None:
+                    largerlist = ListNode.ListNode(current.val)
+                    largerlist_pre = largerlist
+                else:
+                    node = ListNode.ListNode(current.val)
+                    largerlist_pre.next = node
+                    largerlist_pre = node
+            current = current.next
+        if answer:
+            answerlast.next = largerlist
+        else:
+            return head
+        return answer
 
 
 if __name__ == '__main__':
     s = Solution()
-    heights = [2,1,5,6,2,3]
-    print(s.largestRectangleArea(heights))
+    l1 = ListNode.ListNode(3)
+    l2 = ListNode.ListNode(4)
+    l3 = ListNode.ListNode(4)
+    l4 = ListNode.ListNode(5)
+    l5 = ListNode.ListNode(5)
+    l6 = ListNode.ListNode(5)
+    l1.next = l2
+    l2.next = l3
+    l3.next = l4
+    l4.next = l5
+    l5.next = l6
+    l1 = s.partition(l1, 3)
+    while l1:
+        print(l1.val)
+        l1 = l1.next
