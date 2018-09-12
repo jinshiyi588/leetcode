@@ -650,8 +650,39 @@ class Solution(object):
                 return True
         return False
 
+    def merge(self, nums1, m, nums2, n):
+        """
+        :type nums1: List[int]
+        :type m: int
+        :type nums2: List[int]
+        :type n: int
+        :rtype: void Do not return anything, modify nums1 in-place instead.
+        """
+        if not nums1 or n == 0:
+            return
+        i = 0
+        ri = 0
+        j = 0
+        while ri < m and j < n:
+            while ri < m and nums1[i] <= nums2[j]:
+                i += 1
+                ri += 1
+            if ri < m:
+                nums1.insert(i, nums2[j])
+                nums1.pop()
+                i += 1
+                j += 1
+        while i < len(nums1) and j < n:
+            nums1[i] = nums2[j]
+            i += 1
+            j += 1
+
 
 if __name__ == '__main__':
     s = Solution()
-    print(s.isScramble('abcdefghijklmn', 'efghijklmncadb'))
+    nums1 = [-1,0,0,3,3,3,0,0,0]
+    nums2 = [1,2,2]
+    s.merge(nums1,6,nums2,3)
+    for i in range(len(nums1)):
+        print(nums1[i])
 
