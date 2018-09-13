@@ -677,12 +677,61 @@ class Solution(object):
             i += 1
             j += 1
 
+    def grayCode(self, n):
+        """
+        :type n: int
+        :rtype: List[int]
+        """
+        res = []
+        for i in range(2**n):
+            res.append(i >> 1 ^ i)
+        return res
+
+    def subsetsWithDup(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[List[int]]
+        """
+        res = []
+        res.append([])
+        for i in range(len(nums)):
+            for j in range(len(res)):
+                current = []
+                current_ans = res[j]
+                for k in range(len(current_ans)):
+                    current.append(current_ans[k])
+                current.append(nums[i])
+                current.sort()
+                if current not in res:
+                    res.append(current)
+        return res
+
+    def numDecodings(self, s):
+        """
+        :type s: str
+        :rtype: int
+        """
+        dp = []
+        if len(s) == 0 or s[0] == '0':
+            return 0
+        elif len(s) == 1:
+            return 1
+        dp.append(1)
+        for i in range(1, len(s)):
+            if s[i-1] == '0':
+                dp.append(0)
+            else:
+                dp.append(dp[i-1])
+            if (s[i-2] == '1' or s[i-2] == '2') and s[i-1] <= '6':
+                if i == 1 and s[i] != '0':
+                    dp[i] += 1
+                elif i != 1:
+                    dp[i] += dp[i-2]
+        return dp[len(s)-1]
+
 
 if __name__ == '__main__':
     s = Solution()
-    nums1 = [-1,0,0,3,3,3,0,0,0]
-    nums2 = [1,2,2]
-    s.merge(nums1,6,nums2,3)
-    for i in range(len(nums1)):
-        print(nums1[i])
+    print(s.numDecodings('101'))
+
 
