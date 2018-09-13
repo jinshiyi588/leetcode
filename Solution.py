@@ -718,20 +718,36 @@ class Solution(object):
             return 1
         dp.append(1)
         for i in range(1, len(s)):
-            if s[i-1] == '0':
-                dp.append(0)
+            if i == 1:
+                if s[i] == '0':
+                    if s[0] == '1' or s[0] == '2':
+                        dp.append(1)
+                    else:
+                        dp.append(0)
+                else:
+                    if s[0] == '1' or (s[0] == '2' and s[1] <= '6'):
+                        dp.append(2)
+                    else:
+                        dp.append(1)
             else:
-                dp.append(dp[i-1])
-            if (s[i-2] == '1' or s[i-2] == '2') and s[i-1] <= '6':
-                if i == 1 and s[i] != '0':
-                    dp[i] += 1
-                elif i != 1:
-                    dp[i] += dp[i-2]
+                if s[i-1] == '0' and s[i] == '0':
+                    dp.append(0)
+                else:
+                    if s[i] == '0':
+                        if s[i-1] == '1' or s[i-1] == '2':
+                            dp.append(dp[i-2])
+                        else:
+                            dp.append(0)
+                    else:
+                        if s[i-1] == '1' or (s[i-1] == '2' and s[i] <= '6'):
+                            dp.append(dp[i-1]+dp[i-2])
+                        else:
+                            dp.append(dp[i-1])
         return dp[len(s)-1]
 
 
 if __name__ == '__main__':
     s = Solution()
-    print(s.numDecodings('101'))
+    print(s.numDecodings('17'))
 
 
