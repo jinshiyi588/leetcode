@@ -745,9 +745,89 @@ class Solution(object):
                             dp.append(dp[i-1])
         return dp[len(s)-1]
 
+    def reverseBetween(self, head, m, n):
+        """
+        :type head: ListNode
+        :type m: int
+        :type n: int
+        :rtype: ListNode
+        """
+        if m == n:
+            return head
+        res_node = ListNode.ListNode(0)
+        res_node_last = res_node
+        index = 1
+        current = head
+        restnode = None
+        while current:
+            if index == m:
+                while index < n:
+                    current = current.next
+                    index += 1
+                restnode = current.next
+                temp = head
+                index = 1
+                while index < m:
+                    temp = temp.next
+                    index += 1
+                prenode = ListNode.ListNode(temp.val)
+                temp = temp.next
+                index += 1
+                if n-m > 1:
+                    nextnode = temp.next
+                    temp = ListNode.ListNode(temp.val)
+                    while index < n:
+                        temp.next = prenode
+                        prenode = temp
+                        temp = ListNode.ListNode(nextnode.val)
+                        nextnode = nextnode.next
+                        index += 1
+                temp.next = prenode
+                res_node_last.next = temp
+                while temp.next:
+                    temp = temp.next
+                temp.next = restnode
+                return res_node.next
+            else:
+                res_node_last.next = ListNode.ListNode(current.val)
+                res_node_last = res_node_last.next
+                current = current.next
+                index += 1
+
+    def restoreIpAddresses(self, s):
+        """
+        :type s: str
+        :rtype: List[str]
+        """
+        if len(s) < 4 or len(s) > 12:
+            return []
+        result = []
+
+    def restoreIpAddress_rec(self, s, index, ipindex, current, result):
+        if ipindex == 5 and index == len(s):
+            result.append(current)
+            return
+        if len(s)-index < (4 - ipindex):
+            return
+        if len(s)-index >= 1:
+            str1 = s[index:index + 1]
+        if len(s)-index >= 2:
+            str2 = s[index:index + 2]
+        if len(s)-index >= 3:
+            str3 = s[index:index + 3]
+
+
 
 if __name__ == '__main__':
     s = Solution()
-    print(s.numDecodings('17'))
+    l1 = ListNode.ListNode(1)
+    l2 = ListNode.ListNode(2)
+    l3 = ListNode.ListNode(3)
+    l4 = ListNode.ListNode(4)
+
+    l1 = s.reverseBetween(l1, 2,4)
+    while l1:
+        print(l1.val)
+        l1 = l1.next
 
 
