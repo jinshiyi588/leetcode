@@ -3,6 +3,7 @@ import collections
 import ListNode
 import Stack
 import copy
+import TreeNode
 
 
 class Solution(object):
@@ -802,32 +803,88 @@ class Solution(object):
         if len(s) < 4 or len(s) > 12:
             return []
         result = []
+        self.restoreIpAddress_rec(s, 0, 0, '', result)
+        return result
 
     def restoreIpAddress_rec(self, s, index, ipindex, current, result):
-        if ipindex == 5 and index == len(s):
+        if ipindex == 4 and index == len(s):
             result.append(current)
             return
         if len(s)-index < (4 - ipindex):
             return
         if len(s)-index >= 1:
             str1 = s[index:index + 1]
+            if current == '':
+                str = str1
+            else:
+                str = current + '.' + str1
+            self.restoreIpAddress_rec(s, index+1, ipindex+1, str, result)
         if len(s)-index >= 2:
             str2 = s[index:index + 2]
+            if str2[0] == '0':
+                return
+            if current == '':
+                str = str2
+            else:
+                str = current + '.' + str2
+            self.restoreIpAddress_rec(s, index+2, ipindex+1, str, result)
         if len(s)-index >= 3:
             str3 = s[index:index + 3]
+            if str3[0] == '0':
+                return
+            if int(str3) < 256:
+                if current == '':
+                    str = str3
+                else:
+                    str = current + '.' + str3
+                self.restoreIpAddress_rec(s, index+3, ipindex+1, str, result)
 
+    def inorderTraversal(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        result = []
+        current = root
+        while current:
+            if not current.left:
+                result.append(current.val)
+                current = current.right
+            else:
+                pre = current.left
+                while pre.right and pre.right != current:
+                    pre = pre.right
+                if not pre.right:
+                    pre.right = current
+                    current = current.left
+                else:
+                    pre.right = None
+                    result.append(current.val)
+                    current = current.right
+        return result
+
+    def numTrees(self, n):
+        """
+        :type n: int
+        :rtype: int
+        """
+        dpArray = [0, 1]
+        index = 2
+        while index <= n:
+            current = 0
+            for i in range(1, (index+1)):
+                if i == 1 or i == index:
+                    current += dpArray[index-1]
+                else:
+                    current += dpArray[index-i]*dpArray[i-1]
+            dpArray.append(current)
+            index += 1
+        return dpArray[n]
 
 
 if __name__ == '__main__':
     s = Solution()
-    l1 = ListNode.ListNode(1)
-    l2 = ListNode.ListNode(2)
-    l3 = ListNode.ListNode(3)
-    l4 = ListNode.ListNode(4)
-
-    l1 = s.reverseBetween(l1, 2,4)
-    while l1:
-        print(l1.val)
-        l1 = l1.next
+    l1 = s.numTrees(0)
+    print(l1)
 
 
