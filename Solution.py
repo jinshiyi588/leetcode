@@ -881,10 +881,49 @@ class Solution(object):
             index += 1
         return dpArray[n]
 
+    def generateTrees(self, n):
+        """
+        :type n: int
+        :rtype: List[TreeNode]
+        """
+        if n == 0:
+            return []
+        return self.generateTrees_rec(1, n)
+
+    def generateTrees_rec(self, left, right):
+        allroots = []
+        if left>right:
+            allroots.append(None)
+            return allroots
+        if left == right:
+            allroots.append(TreeNode.TreeNode(left))
+            return allroots
+        for i in range(left, right+1):
+            leftchildnodes = self.generateTrees_rec(left, i-1)
+            rightchildnodes = self.generateTrees_rec(i+1, right)
+            for j in range(len(leftchildnodes)):
+                for k in range(len(rightchildnodes)):
+                    root = TreeNode.TreeNode(i)
+                    root.left = leftchildnodes[j]
+                    root.right = rightchildnodes[k]
+                    allroots.append(root)
+        return allroots
+
 
 if __name__ == '__main__':
     s = Solution()
-    l1 = s.numTrees(0)
-    print(l1)
+    l1 = s.generateTrees(3)
+    for r in l1:
+        queue = []
+        queue.append(r)
+        while queue:
+            n = queue[0]
+            print(n.val)
+            queue.pop(0)
+            if n.left :
+                queue.append(n.left)
+            if n.right:
+                queue.append(n.right)
+        print("------")
 
 
