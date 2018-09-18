@@ -909,21 +909,35 @@ class Solution(object):
                     allroots.append(root)
         return allroots
 
+    def isInterleave(self, s1, s2, s3):
+        """
+        :type s1: str
+        :type s2: str
+        :type s3: str
+        :rtype: bool
+        """
+        m = len(s1)
+        n = len(s2)
+        if (m+n) != len(s3):
+            return False
+        dpArrays = [([False] * (n+1)) for i in range(m+1)]
+        dpArrays[0][0]=True
+        for i in range(m):
+            if s1[i] == s3[i]:
+                dpArrays[i+1][0] = True
+        for j in range(n):
+            if s2[j] == s3[j]:
+                dpArrays[0][j+1] = True
+        for i in range(1, m+1):
+            for j in range(1, n+1):
+                if (s1[i-1]==s3[i+j-1] and dpArrays[i-1][j]) or (s2[j-1] == s3[i+j-1] and dpArrays[i][j-1]):
+                    dpArrays[i][j] = True
+        return dpArrays[m][n]
+
 
 if __name__ == '__main__':
     s = Solution()
-    l1 = s.generateTrees(3)
-    for r in l1:
-        queue = []
-        queue.append(r)
-        while queue:
-            n = queue[0]
-            print(n.val)
-            queue.pop(0)
-            if n.left :
-                queue.append(n.left)
-            if n.right:
-                queue.append(n.right)
-        print("------")
+    print(s.isInterleave("aabcc", "dbbca", "aadbbcbcac"))
+
 
 
