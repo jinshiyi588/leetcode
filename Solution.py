@@ -933,6 +933,12 @@ class Solution(object):
                 if (s1[i-1]==s3[i+j-1] and dpArrays[i-1][j]) or (s2[j-1] == s3[i+j-1] and dpArrays[i][j-1]):
                     dpArrays[i][j] = True
         return dpArrays[m][n]
+    
+    def recoverTree(self, root):
+        """
+        :type root: TreeNode
+        :rtype: void Do not return anything, modify root in-place instead.
+        """
 
 
 if __name__ == '__main__':
