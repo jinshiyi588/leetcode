@@ -934,7 +934,6 @@ class Solution(object):
                     dpArrays[i][j] = True
         return dpArrays[m][n]
 
-
 if __name__ == '__main__':
     s = Solution()
     print(s.isInterleave("aabcc", "dbbca", "aadbbcbcac"))
