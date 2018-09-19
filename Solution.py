@@ -923,10 +923,10 @@ class Solution(object):
         dpArrays = [([False] * (n+1)) for i in range(m+1)]
         dpArrays[0][0]=True
         for i in range(m):
-            if s1[i] == s3[i]:
+            if s1[i] == s3[i] and dpArrays[i][0]:
                 dpArrays[i+1][0] = True
         for j in range(n):
-            if s2[j] == s3[j]:
+            if s2[j] == s3[j] and dpArrays[0][j]:
                 dpArrays[0][j+1] = True
         for i in range(1, m+1):
             for j in range(1, n+1):
@@ -940,10 +940,16 @@ class Solution(object):
         :rtype: void Do not return anything, modify root in-place instead.
         """
 
+    def isValidBST(self, root):
+        """
+        :type root: TreeNode
+        :rtype: bool
+        """
+
 
 if __name__ == '__main__':
     s = Solution()
-    print(s.isInterleave("aabcc", "dbbca", "aadbbcbcac"))
+    print(s.isInterleave("db", "b", "cbb"))
 
 
 
