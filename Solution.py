@@ -933,23 +933,159 @@ class Solution(object):
                 if (s1[i-1]==s3[i+j-1] and dpArrays[i-1][j]) or (s2[j-1] == s3[i+j-1] and dpArrays[i][j-1]):
                     dpArrays[i][j] = True
         return dpArrays[m][n]
-    
+
+    pre = None
+    first = None
+    second = None
+
     def recoverTree(self, root):
         """
         :type root: TreeNode
         :rtype: void Do not return anything, modify root in-place instead.
         """
+        self.recoverTree_inorder(root)
+        if self.first is not None and self.second is not None:
+            temp = self.first.val
+            self.first.val = self.second.val
+            self.second.val = temp
+            print(root.val)
+
+    def recoverTree_inorder(self, root):
+        if root is None:
+            return
+        self.recoverTree_inorder(root.left)
+        if self.pre is None:
+            self.pre = root
+        else:
+            if self.pre.val > root.val:
+                if self.first is None:
+                    self.first = self.pre
+                self.second = root
+            self.pre = root
+        self.recoverTree_inorder(root.right)
 
     def isValidBST(self, root):
         """
         :type root: TreeNode
         :rtype: bool
         """
+        if not root:
+            return True
+        return self.isValidBST_rec(root, float("-inf"), float("inf"))
+
+    def isValidBST_rec(self, node, lower, upper):
+        if node.val <= lower or node.val >= upper:
+            return False
+        if node.left and not self.isValidBST_rec(node.left, lower, node.val):
+                return False
+        if node.right and not self.isValidBST_rec(node.right, node.val, upper):
+                return False
+        return True
+
+    def isSameTree(self, p, q):
+        if not p and not q:
+            return True
+        if not p or not q:
+            return False
+        if p.val != q.val:
+            return False
+        return self.isSameTree(p.left, q.left) & self.isSameTree(p.right, q.right)
+
+    def buildTree(self, inorder, postorder):
+        """
+        :type inorder: List[int]
+        :type postorder: List[int]
+        :rtype: TreeNode
+        """
+        if not postorder or not inorder:
+            return None
+        root = TreeNode.TreeNode(postorder[len(postorder)-1])
+        root_index = 0
+        for i in inorder:
+            if i != root.val:
+                root_index += 1
+            else:
+                break
+        left_postorder = postorder[:root_index]
+        right_postorder = postorder[root_index:len(postorder)-1]
+        left_inorder = inorder[:root_index]
+        right_inorder = inorder[root_index+1:len(inorder)]
+        if left_inorder and left_postorder:
+            root.left = self.buildTree(left_inorder, left_postorder)
+        if right_inorder and right_postorder:
+            root.right = self.buildTree(right_inorder, right_postorder)
+        return root
+
+    def buildTree1(self, preorder, inorder):
+        """
+        :type preorder: List[int]
+        :type inorder: List[int]
+        :rtype: TreeNode
+        """
+        if not preorder or not inorder:
+            return None
+        root = TreeNode(preorder[0])
+        root_index = 0
+        for i in inorder:
+            if i != preorder[0]:
+                root_index += 1
+            else:
+                break
+        left_preorder = preorder[1:(1+root_index)]
+        right_preorder = preorder[(1+root_index):len(preorder)]
+        left_inorder = inorder[:root_index]
+        right_inorder = inorder[(1+root_index):len(inorder)]
+        if left_preorder and left_inorder:
+            root.left = self.buildTree(left_preorder, left_inorder)
+        if right_preorder and right_inorder:
+            root.right = self.buildTree(right_preorder, right_inorder)
+        return root
+
+    def levelOrderBottom(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[List[int]]
+        """
+        result = []
+        if not root:
+            return result
+        queue = []
+        queue.append(root)
+        while queue:
+            templist = []
+            tempresult = []
+            for i in queue:
+                templist.append(i)
+                tempresult.append(i.val)
+            queue = []
+            result.append(tempresult)
+            for i in templist:
+                if i.left:
+                    queue.append(i.left)
+                if i.right:
+                    queue.append(i.right)
+        result.reverse()
+        return result
+
+    def sortedArrayToBST(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: TreeNode
+        """
+        if not nums:
+            return None
+        mid = int(len(nums)/2)
+        root = TreeNode.TreeNode(nums[mid])
+        if len(nums) > 1:
+            left_nums = nums[:mid]
+            root.left = self.sortedArrayToBST(left_nums)
+        if len(nums) > 2:
+            right_nums = nums[mid+1:len(nums)]
+            root.right = self.sortedArrayToBST(right_nums)
+        return root
 
 
 if __name__ == '__main__':
     s = Solution()
-    print(s.isInterleave("db", "b", "cbb"))
-
-
-
+    root = s.sortedArrayToBST([-10, -3, 0, 5, 9])
+    print(root.val)
